@@ -24,7 +24,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "commit": "git cz -a",
+    "commit": "git-cz -a",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
