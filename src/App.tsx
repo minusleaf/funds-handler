@@ -1,10 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { AddFundWindow } from "./components/AddFundWindow/AddFundWindow";
+import { FundInterface } from "./App.interface";
 
 function App() {
+  const [funds, setFunds] = useState<FundInterface[]>([]);
+
+  const addFund = (newFund: FundInterface) => {
+    setFunds(funds.concat([newFund]));
+  };
   return (
     <div className="App">
+      <AddFundWindow addFund={addFund} />
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
