@@ -22,7 +22,7 @@ export const AddFundWindow = ({ addFund }: AddFundWindowInterface) => {
       alignItems="center"
       left="2rem"
       top="2rem"
-      backgroundColor="#c6ffc6"
+      backgroundColor="#aadcee"
       p="1rem"
       borderRadius="1.5rem"
     >
@@ -50,23 +50,25 @@ export const AddFundWindow = ({ addFund }: AddFundWindowInterface) => {
               <FieldAndLabel label="Manager" name="manager" inputType="input" />
               <FieldAndLabel label="Year" name="year" inputType="input" />
               <FieldAndLabel label="Type" name="type" inputType="select">
-                {FundTypes.map((fund) => (
-                  <option value={fund}>{fund}</option>
+                {FundTypes.map((fund, index) => (
+                  <option key={`type-${index}`} value={fund}>
+                    {fund}
+                  </option>
                 ))}
               </FieldAndLabel>
               <FieldAndLabel label="Is Open" name="isOpen" inputType="select">
                 <option value={1}>Yes</option>
                 <option value={0}>No</option>
               </FieldAndLabel>
+              <Button
+                mt="1rem"
+                backgroundColor="#7a5087"
+                color="white"
+                type="submit"
+              >
+                Submit
+              </Button>
             </Flex>
-            <Button
-              mt="0.5rem"
-              backgroundColor="#7a5087"
-              color="white"
-              type="submit"
-            >
-              Submit
-            </Button>
           </Form>
         )}
       </Formik>
