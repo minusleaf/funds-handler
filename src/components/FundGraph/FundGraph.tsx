@@ -1,24 +1,22 @@
 import React, { useRef, useEffect } from "react";
-import {
-  FundInterface,
-  FundNodeInterface,
-  FundType,
-} from "../../App.interface";
+import { FundNodeInterface } from "../../App.interface";
 import * as d3 from "d3";
 import { D3DragEvent, SimulationLinkDatum, text } from "d3";
 
 export interface FundGraphInterface {
-  linksData: any[];
-  nodesData: FundNodeInterface[];
+  graphElements: {
+    nodes: FundNodeInterface[];
+    links: SimulationLinkDatum<FundNodeInterface>[];
+  };
 }
 
-export const FundGraph = ({ linksData, nodesData }: FundGraphInterface) => {
+export const FundGraph = ({ graphElements }: FundGraphInterface) => {
   const svgRef = useRef(null);
 
   useEffect(() => {
     const updateGraph = async () => {
-      const links = linksData.map((d) => Object.assign({}, d));
-      const nodes = nodesData.map((d) => Object.assign({}, d));
+      const links = graphElements.links.map((d) => Object.assign({}, d));
+      const nodes = graphElements.nodes.map((d) => Object.assign({}, d));
 
       const drag = (
         simulation: d3.Simulation<
@@ -74,7 +72,7 @@ export const FundGraph = ({ linksData, nodesData }: FundGraphInterface) => {
           "link",
           d3.forceLink(links).id((d) => (d as FundNodeInterface).id)
         )
-        .force("charge", d3.forceManyBody())
+        .force("charge", d3.forceManyBody().strength(-240))
         .force(
           "center",
           d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2)
@@ -91,8 +89,8 @@ export const FundGraph = ({ linksData, nodesData }: FundGraphInterface) => {
         .join(
           (enter) => enter.append("line"),
           (exit) => exit.remove()
-        )
-        .attr("stroke-width", (d) => Math.sqrt(d.value));
+        );
+      /* .attr("stroke-width", (d) => Math.sqrt(d.value)); */
 
       const node = svg
         .select("#graph-nodes")
@@ -116,29 +114,32 @@ export const FundGraph = ({ linksData, nodesData }: FundGraphInterface) => {
             const initialOffset = 25;
             cardGroup
               .append("text")
+              .attr("font-weight", "bold")
               .attr("transform", "translate(20, " + initialOffset + ")")
-              .text((d) => (d.type === "FUND" ? d.fund.name : d.type));
+              .text((d) =>
+                d.type === "FUND" && d.fund ? d.fund.name : d.type
+              );
             cardGroup
               .append("text")
               .attr(
                 "transform",
                 "translate(20, " + (textOffset + initialOffset) + ")"
               )
-              .text((d) => (d.type === "FUND" ? d.fund.manager : ""));
+              .text((d) => (d.type === "FUND" && d.fund ? d.fund.manager : ""));
             cardGroup
               .append("text")
               .attr(
                 "transform",
                 "translate(20, " + (textOffset * 2 + initialOffset) + ")"
               )
-              .text((d) => (d.type === "FUND" ? d.fund.year : ""));
+              .text((d) => (d.type === "FUND" && d.fund ? d.fund.year : ""));
             cardGroup
               .append("text")
               .attr(
                 "transform",
                 "translate(20, " + (textOffset * 3 + initialOffset) + ")"
               )
-              .text((d) => (d.type === "FUND" ? d.fund.type : ""));
+              .text((d) => (d.type === "FUND" && d.fund ? d.fund.type : ""));
             cardGroup
               .append("text")
               .attr(
@@ -146,7 +147,8 @@ export const FundGraph = ({ linksData, nodesData }: FundGraphInterface) => {
                 "translate(20, " + (textOffset * 4 + initialOffset) + ")"
               )
               .text((d) => {
-                if (d.type === "FUND") return d.fund.isOpen ? "Open" : "Closed";
+                if (d.type === "FUND" && d.fund)
+                  return d.fund.isOpen ? "Open" : "Closed";
                 return "";
               });
 
@@ -157,81 +159,20 @@ export const FundGraph = ({ linksData, nodesData }: FundGraphInterface) => {
         );
       /* .call(drag(simulation)) */
 
-      /* const labelCard = svg
-        .select("#graph-labels")
-        .selectAll("svg")
-        .data(nodes)
-        .join(
-          (enter) => {
-            const cardSVG = enter.append("svg");
-            const cardGroup = cardSVG.append("g");
-
-            // Card Background
-            cardGroup
-              .append("rect")
-              .classed("fund-label-card", true)
-              .attr("width", "180px")
-              .attr("height", "120px")
-              .attr("rx", "20px");
-
-            // Card Contents
-            cardGroup
-              .append("text")
-              .style("fill", "white")
-              .text((d) => {
-                const fundProperties = d.fund;
-                if (fundProperties)
-                  return `${fundProperties.name}<br />${fundProperties.manager}<br />${fundProperties.type}`;
-                return "";
-              });
-            return cardSVG;
-          },
-          (exit) => exit.remove()
-        ); */
-
-      /* const labelCard = await d3.xml("").then(async (svgImage: Document) => {
-        console.log(FundNodeCard);
-        return svg
-          .select("#graph-labels")
-          .selectAll("svg")
-          .data(nodes)
-          .join(
-            (enter) =>
-              enter.append("svg").html(svgImage.documentElement.innerHTML),
-            (exit) => exit.remove()
-          );
-      }); */
-
-      /* const labelText = svg
-        .selectAll("#graph-labels")
-        .selectAll("text")
-        .data(nodes)
-        .join(
-          (enter) => enter.append("text"),
-          (exit) => exit.remove()
-        )
-        .style("fill", "white")
-        .text((d) => {
-          const fundProperties = d.fund;
-          if (fundProperties)
-            return `${fundProperties.name}<br />${fundProperties.manager}<br />${fundProperties.type}`;
-          return "";
-        });
- */
       simulation.on("tick", () => {
-        link
+        /* link
           .attr("x1", (d) => d.source.x)
           .attr("y1", (d) => d.source.y)
           .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y);
+          .attr("y2", (d) => d.target.y); */
 
         node
-          .attr("x", (d) => (d.x ? (d.x as number) : 0))
-          .attr("y", (d) => (d.y ? (d.y as number) : 0));
+          .attr("x", (d) => (d.x ? (d.x as number) - 90 : 0))
+          .attr("y", (d) => (d.y ? (d.y as number) - 60 : 0));
       });
     };
     updateGraph();
-  }, [linksData, nodesData]);
+  }, [graphElements]);
 
   return (
     <svg ref={svgRef} width="100%" id="graph-svg">
