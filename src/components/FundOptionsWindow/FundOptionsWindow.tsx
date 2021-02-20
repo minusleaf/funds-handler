@@ -68,7 +68,15 @@ export const FundOptionsWindow = ({
           } as FundInterface
         }
         onSubmit={(values) => {
-          addFund(values);
+          let isOpen: string | boolean = values.isOpen;
+          if (typeof isOpen === "string") {
+            if (isOpen === "1") isOpen = true;
+            else isOpen = false;
+          }
+          addFund({
+            ...values,
+            isOpen: isOpen,
+          });
         }}
       >
         {() => (
