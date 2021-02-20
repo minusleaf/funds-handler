@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { FundOptionsWindow } from "./components/FundOptionsWindow/FundOptionsWindow";
 import {
-  FundAttributes,
+  SelectionFundAttributes,
   FundInterface,
   FundNodeInterface,
   GroupRootNodeInterface,
@@ -51,7 +51,7 @@ export const updateGroupRootNodesAndLinks = (
             groupRootNodesAndLinks.groupRootNodes.push({
               id: newGroupRootNodeId,
               type: NodeType.GROUP_ROOT,
-              groupRootAttribute: attribute as FundAttributes,
+              groupRootAttribute: attribute as SelectionFundAttributes,
               groupRootText: nodeAttributeValue,
             });
             groupRootId += 1;
@@ -86,14 +86,10 @@ function App() {
     links: [],
   });
   const graphNodes = useRef<FundNodeInterface[]>([]);
-  const [
-    selectedConnectionTypes,
-    setSelectedConnectionTypes,
-  ] = useState<SelectedConnectionTypesInterface>({
-    name: false,
+  const selectedConnectionTypes = useRef<SelectedConnectionTypesInterface>({
     manager: false,
-    year: true,
-    type: true,
+    year: false,
+    type: false,
     isOpen: false,
   });
 
@@ -107,8 +103,21 @@ function App() {
     isOpen: {},
   });
 
+  const updateGraphElements = () => {
+    const updatedGroupRootNodesAndLinks = updateGroupRootNodesAndLinks(
+      attributeFrequency.current,
+      selectedConnectionTypes.current
+    );
+
+    groupRootNodes.current = updatedGroupRootNodesAndLinks.groupRootNodes;
+    setGraphElements({
+      nodes: graphNodes.current.concat(groupRootNodes.current),
+      links: updatedGroupRootNodesAndLinks.graphLinks,
+    });
+  };
+
   const addFund = (newFund: FundInterface) => {
-    // A new fund is added, so let's update the nodes and links.
+    // A new fund is added, so let's update the frequency model and fund nodes.
     const newGraphNode = {
       id: nextGeneratedId.current.toString(),
       type: NodeType.FUND,
@@ -120,37 +129,16 @@ function App() {
       newGraphNode,
       attributeFrequency.current
     );
-    const updatedGroupRootNodesAndLinks = updateGroupRootNodesAndLinks(
-      attributeFrequency.current,
-      selectedConnectionTypes
-    );
-    groupRootNodes.current = updatedGroupRootNodesAndLinks.groupRootNodes;
-    /* console.log(
-      "Attributes:",
-      attributeFrequency.current,
-      "- Group Roots:",
-      groupRootNodes.current,
-      "- Nodes:",
-      graphNodes.current,
-      "- Links:",
-      updatedGroupRootNodesAndLinks.graphLinks
-    ); */
-    setGraphElements({
-      nodes: graphNodes.current.concat(groupRootNodes.current),
-      links: updatedGroupRootNodesAndLinks.graphLinks,
-    });
+    updateGraphElements();
   };
 
   const updateSelectedConnectionTypes = (
-    attribute: FundAttributes,
+    attribute: SelectionFundAttributes,
     newBoolValue: boolean
   ) => {
     // Changes to the selectedConnectionTypes update other state variables as well.
-    const newSelectedConnectionTypes = {
-      ...selectedConnectionTypes,
-      [attribute as FundAttributes]: newBoolValue,
-    };
-    setSelectedConnectionTypes(newSelectedConnectionTypes);
+    selectedConnectionTypes.current[attribute] = newBoolValue;
+    updateGraphElements();
   };
 
   return (
@@ -160,7 +148,11 @@ function App() {
       height="100vh"
       backgroundImage="linear-gradient(rgb(11, 21, 64), rgb(35, 5, 38))"
     >
-      <FundOptionsWindow addFund={addFund} />
+      <FundOptionsWindow
+        addFund={addFund}
+        updateConnectedTypes={updateSelectedConnectionTypes}
+        defaultConnectedTypes={selectedConnectionTypes.current}
+      />
       <FundGraphGenerator graphElements={graphElements} />
     </Flex>
   );

@@ -1,7 +1,13 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import React from "react";
-import { FundInterface, FundType } from "../../App.interface";
+import Switch from "react-switch";
+import React, { useState } from "react";
+import {
+  SelectionFundAttributes,
+  FundInterface,
+  FundType,
+  SelectedConnectionTypesInterface,
+} from "../../App.interface";
 import { FieldAndLabel } from "./components/FieldAndLabel/FieldAndLabel";
 
 const FundTypes: FundType[] = [
@@ -12,9 +18,31 @@ const FundTypes: FundType[] = [
 
 export interface FundOptionsWindowInterface {
   addFund: (newFund: FundInterface) => void;
+  updateConnectedTypes: (
+    attribute: SelectionFundAttributes,
+    newBoolValue: boolean
+  ) => void;
+  defaultConnectedTypes: SelectedConnectionTypesInterface;
 }
 
-export const FundOptionsWindow = ({ addFund }: FundOptionsWindowInterface) => {
+export const FundOptionsWindow = ({
+  addFund,
+  updateConnectedTypes,
+  defaultConnectedTypes,
+}: FundOptionsWindowInterface) => {
+  const [
+    connectedTypes,
+    setConnectedTypes,
+  ] = useState<SelectedConnectionTypesInterface>(defaultConnectedTypes);
+
+  const handleSwitchChange = (attribute: SelectionFundAttributes) => {
+    setConnectedTypes({
+      ...connectedTypes,
+      [attribute]: !connectedTypes[attribute],
+    });
+    updateConnectedTypes(attribute, !connectedTypes[attribute]);
+  };
+
   return (
     <Flex
       position="absolute"
@@ -72,6 +100,24 @@ export const FundOptionsWindow = ({ addFund }: FundOptionsWindowInterface) => {
           </Form>
         )}
       </Formik>
+      <Flex flexDirection="column" mt="2rem" width="100%">
+        <Text fontWeight="bold" textAlign="center" mb="1rem">
+          Connect By
+        </Text>
+        {Object.entries(connectedTypes).map(([attribute, boolValue]) => (
+          <label key={`connect-by-${attribute}`}>
+            <Flex justifyContent="space-between" my="0.25rem">
+              <Text>{attribute}</Text>
+              <Switch
+                onChange={() =>
+                  handleSwitchChange(attribute as SelectionFundAttributes)
+                }
+                checked={boolValue}
+              />
+            </Flex>
+          </label>
+        ))}
+      </Flex>
     </Flex>
   );
 };

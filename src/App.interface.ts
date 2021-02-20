@@ -6,8 +6,7 @@ export enum FundType {
   HEDGE_FUND = "Hedge Fund",
 }
 
-export enum FundAttributes {
-  NAME = "name",
+export enum SelectionFundAttributes {
   MANAGER = "manager",
   YEAR = "year",
   TYPE = "type",
@@ -35,11 +34,10 @@ export interface FundNodeInterface extends SimulationNodeDatum {
 
 export interface GroupRootNodeInterface extends FundNodeInterface {
   groupRootText: string;
-  groupRootAttribute: FundAttributes;
+  groupRootAttribute: SelectionFundAttributes;
 }
 
 export interface SelectedConnectionTypesInterface {
-  name: boolean;
   manager: boolean;
   year: boolean;
   type: boolean;
