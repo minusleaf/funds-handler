@@ -103,16 +103,6 @@ export const FundGraphGenerator = ({ graphElements }) => {
 
       const svg = d3.select(svgRef.current);
 
-      const colorLinesForDebug = [
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "blue",
-        "purple",
-        "white",
-      ];
-
       const link = svg
         .select("#graph-links")
         .attr("stroke", "#FFF")
