@@ -1,6 +1,8 @@
 # Getting Started with Funds Handler
 
-This is a simple web app.
+Use the settings on the left to add fund elements and toggle between different connectors in this dynamic force graph.
+
+I tried to get FundGraph.tsx to work as a TypeScript file, but the types were very annoying to deal with so I stuck with vanilla JS in the end.
 
 ## Available Scripts
 
